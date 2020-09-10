@@ -4,7 +4,6 @@ import "testing"
 
 func assertExpectedMessages(expectedMsgs []Message, ch chan Message, t *testing.T) {
 	for _, expectedMsg := range expectedMsgs {
-		t.Log(expectedMsg.Message)
 		msg := <-ch
 		if msg.Message != expectedMsg.Message {
 			t.Fatalf("Unexpected Message in reply: %s != %s", msg.Message, expectedMsg.Message)

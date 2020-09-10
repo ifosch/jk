@@ -23,12 +23,9 @@ func TestJenkins_NewJenkins(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		t.Log(tc.url)
 		_, err := NewJenkins(tc.url, "admin", "admin", nil)
 		if err != nil {
 			if tc.expectedError != nil {
-				t.Log(err)
-				t.Log(tc.expectedError)
 				if fmt.Sprintf("%v", err) != fmt.Sprintf("%v", tc.expectedError) {
 					t.Fatalf("got %v error, but expected %v", err, tc.expectedError)
 				}
