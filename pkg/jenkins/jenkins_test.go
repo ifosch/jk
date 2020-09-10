@@ -192,11 +192,8 @@ func TestJenkins_Build(t *testing.T) {
 
 	j := &Jenkins{client: jenkinsClientMock{}}
 	for _, tc := range tcs {
-		getQueueItemInfo = func(j *Jenkins, queueItemURL string) (buildID int64, err error) {
-			if queueItemURL != fmt.Sprintf("/queue/item/%v", tc.item) {
-				return 0, nil
-			}
-			return tc.buildID, nil
+		getQueueItemMock = func(number int64) (task *Task, err error) {
+			return &Task{BuildID: tc.buildID}, nil
 		}
 		waitForBuild = func(build *gojenkins.Build) (err error) {
 			build.Raw.Building = false

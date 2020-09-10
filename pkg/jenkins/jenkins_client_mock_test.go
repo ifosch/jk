@@ -27,3 +27,9 @@ var getJobMock func(jobName string, parents ...string) (job *gojenkins.Job, err 
 func (j jenkinsClientMock) GetJob(jobName string, parents ...string) (job *gojenkins.Job, err error) {
 	return getJobMock(jobName, parents...)
 }
+
+var getQueueItemMock func(int64) (*Task, error)
+
+func (j jenkinsClientMock) GetQueueItem(number int64) (task *Task, err error) {
+	return getQueueItemMock(number)
+}

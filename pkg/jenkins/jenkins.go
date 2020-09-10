@@ -9,7 +9,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/bndr/gojenkins"
 	"github.com/ifosch/jk/pkg/templates"
 )
 
@@ -27,20 +26,17 @@ func NewJenkins(
 	url, user, password string,
 	client *http.Client,
 ) (jenkins *Jenkins, err error) {
-	j, err := gojenkins.CreateJenkins(
-		client,
+	c, err := NewClient(
 		url,
 		user,
 		password,
-	).Init()
+		client,
+	)
 	if err != nil {
 		return
 	}
-	if j.Version == "" {
-		return nil, fmt.Errorf("Jenkins server version is empty")
-	}
 	return &Jenkins{
-		client: j,
+		client: c,
 	}, nil
 }
 
@@ -115,32 +111,6 @@ func (j *Jenkins) Describe(jobName string, t *template.Template, out chan Messag
 	)
 }
 
-func (j *Jenkins) getBuildFromQueueItem(jobName string, number int64, out chan Message) (build *gojenkins.Build, err error) {
-	queueItemURL := fmt.Sprintf("/queue/item/%v", number)
-	buildID, err := getQueueItemInfo(j, queueItemURL)
-	if err != nil {
-		return nil, fmt.Errorf("Task get error %v", err)
-	}
-	reply(
-		fmt.Sprintf("Build queued /job/%v/%v", jobName, buildID),
-		false,
-		false,
-		out,
-	)
-	for {
-		if buildID != 0 {
-			break
-		}
-		time.Sleep(100 * time.Millisecond)
-		buildID, err = getQueueItemInfo(j, queueItemURL)
-		if err != nil {
-			return nil, fmt.Errorf("Task get error %v", err)
-		}
-	}
-	build, err = j.client.GetBuild(jobName, buildID)
-	return
-}
-
 // Build executes jobName with params parameters. It will use the
 // channel to reply with updates on the progress of the build.
 func (j *Jenkins) Build(jobName string, params map[string]string, out chan Message) {
@@ -153,7 +123,31 @@ func (j *Jenkins) Build(jobName string, params map[string]string, out chan Messa
 			out,
 		)
 	}
-	build, err := j.getBuildFromQueueItem(jobName, number, out)
+	task, err := j.client.GetQueueItem(number)
+	if err != nil {
+		reply(
+			fmt.Sprintf("Task get error %v", err),
+			true,
+			true,
+			out,
+		)
+	}
+	buildID := task.BuildID
+	reply(
+		fmt.Sprintf("Build queued /job/%v/%v", jobName, buildID),
+		false,
+		false,
+		out,
+	)
+	for {
+		if buildID != 0 {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+		task.Poll()
+		buildID = task.BuildID
+	}
+	build, err := j.client.GetBuild(jobName, buildID)
 	if err != nil {
 		reply(
 			fmt.Sprintf("Queue item get error %v", err),
