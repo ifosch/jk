@@ -113,19 +113,7 @@ func TestJenkins_List(t *testing.T) {
 		defer close(channel)
 		go j.List(channel)
 
-		for _, expectedMsg := range tc.messages {
-			t.Log(expectedMsg.Message)
-			msg := <-channel
-			if msg.Message != expectedMsg.Message {
-				t.Fatalf("Unexpected Message in reply: %s != %s", msg.Message, expectedMsg.Message)
-			}
-			if msg.Error != expectedMsg.Error {
-				t.Fatalf("Unexpected Error in reply: %v != %v", msg.Error, expectedMsg.Error)
-			}
-			if msg.Done != expectedMsg.Done {
-				t.Fatalf("Unexpected Done in reply: %v != %v", msg.Done, expectedMsg.Done)
-			}
-		}
+		assertExpectedMessages(tc.messages, channel, t)
 	}
 }
 
@@ -166,19 +154,7 @@ func TestJenkins_Describe(t *testing.T) {
 		defer close(channel)
 		go j.Describe(tc.jobName, templ, channel)
 
-		for _, expectedMsg := range tc.messages {
-			t.Log(expectedMsg.Message)
-			msg := <-channel
-			if msg.Message != expectedMsg.Message {
-				t.Fatalf("Unexpected Message in reply: %s != %s", msg.Message, expectedMsg.Message)
-			}
-			if msg.Error != expectedMsg.Error {
-				t.Fatalf("Unexpected Error in reply: %v != %v", msg.Error, expectedMsg.Error)
-			}
-			if msg.Done != expectedMsg.Done {
-				t.Fatalf("Unexpected Done in reply: %v != %v", msg.Done, expectedMsg.Done)
-			}
-		}
+		assertExpectedMessages(tc.messages, channel, t)
 	}
 }
 
@@ -268,18 +244,6 @@ func TestJenkins_Build(t *testing.T) {
 		defer close(channel)
 		go j.Build(tc.jobName, tc.params, channel)
 
-		for _, expectedMsg := range tc.messages {
-			t.Log(expectedMsg.Message)
-			msg := <-channel
-			if msg.Message != expectedMsg.Message {
-				t.Fatalf("Unexpected Message in reply: %s != %s", msg.Message, expectedMsg.Message)
-			}
-			if msg.Error != expectedMsg.Error {
-				t.Fatalf("Unexpected Error in reply: %v != %v", msg.Error, expectedMsg.Error)
-			}
-			if msg.Done != expectedMsg.Done {
-				t.Fatalf("Unexpected Done in reply: %v != %v", msg.Done, expectedMsg.Done)
-			}
-		}
+		assertExpectedMessages(tc.messages, channel, t)
 	}
 }
