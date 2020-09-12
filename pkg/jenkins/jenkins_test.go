@@ -67,7 +67,7 @@ func TestJenkins_List(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		j := &Jenkins{client: newJenkinsClientMock(tc.jobNameList)}
+		j := &Jenkins{client: newJenkinsClientMock(tc.jobNameList, 0, 0)}
 
 		channel := make(chan Message)
 		defer close(channel)
@@ -103,7 +103,7 @@ func TestJenkins_Describe(t *testing.T) {
 
 	for _, tc := range tcs {
 		templ, _ := template.New("Job").Parse(tc.tmpl)
-		j := &Jenkins{client: newJenkinsClientMock(tc.jobNameList)}
+		j := &Jenkins{client: newJenkinsClientMock(tc.jobNameList, 0, 0)}
 
 		channel := make(chan Message)
 		defer close(channel)
@@ -115,36 +115,46 @@ func TestJenkins_Describe(t *testing.T) {
 
 func TestJenkins_Build(t *testing.T) {
 	tcs := []struct {
-		jobName  string
-		params   map[string]string
-		item     int64
-		buildID  int64
-		messages []Message
+		jobNameList []string
+		jobName     string
+		params      map[string]string
+		item        int64
+		buildID     int64
+		messages    []Message
 	}{
 		{
-			"job_name",
+			[]string{
+				"job1",
+				"job2",
+			},
+			"job1",
 			map[string]string{},
 			1000,
 			100,
 			[]Message{
 				{
-					Message: "Build queued /job/job_name/100",
+					Message: "Build queued /job/job1/100",
 					Error:   false,
 					Done:    false,
 				},
 				{
-					Message: "Build started /job/job_name/100",
+					Message: "Build started /job/job1/100",
 					Error:   false,
 					Done:    false,
 				},
 				{
-					Message: "Build finished /job/job_name/100",
+					Message: "Build finished /job/job1/100",
 					Error:   false,
 					Done:    true,
 				},
 			},
 		},
 		{
+			[]string{
+				"job1",
+				"job2",
+				"job_with_params",
+			},
 			"job_with_params",
 			map[string]string{
 				"ARG1": "value1",
@@ -171,25 +181,11 @@ func TestJenkins_Build(t *testing.T) {
 		},
 	}
 
-	j := &Jenkins{client: jenkinsClientMock{}}
 	for _, tc := range tcs {
-		getQueueItemMock = func(number int64) (task *Task, err error) {
-			return &Task{BuildID: tc.buildID}, nil
-		}
+		j := &Jenkins{client: newJenkinsClientMock(tc.jobNameList, tc.buildID, tc.item)}
 		waitForBuild = func(build *gojenkins.Build) (err error) {
 			build.Raw.Building = false
 			return nil
-		}
-		getBuildMock = func(jobName string, buildID int64) (build *gojenkins.Build, err error) {
-			return &gojenkins.Build{
-				Base: fmt.Sprintf("/job/%v/%v", jobName, buildID),
-				Raw: &gojenkins.BuildResponse{
-					Building: true,
-				},
-			}, nil
-		}
-		buildJobMock = func(jobName string, option ...interface{}) (queueItem int64, err error) {
-			return tc.item, nil
 		}
 
 		channel := make(chan Message)

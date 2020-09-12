@@ -2,16 +2,22 @@ package jenkins
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/bndr/gojenkins"
 )
 
 type jenkinsClientMock struct {
-	jobs []*gojenkins.Job
+	jobs        []*gojenkins.Job
+	nextBuildID int64
+	nextItemID  int64
 }
 
-func newJenkinsClientMock(jobNames []string) (j jenkinsClientMock) {
-	j = jenkinsClientMock{}
+func newJenkinsClientMock(jobNames []string, nextBuildID int64, nextItemID int64) (j jenkinsClientMock) {
+	j = jenkinsClientMock{
+		nextBuildID: nextBuildID,
+		nextItemID:  nextItemID,
+	}
 	for _, name := range jobNames {
 		j.jobs = append(
 			j.jobs,
@@ -25,16 +31,17 @@ func newJenkinsClientMock(jobNames []string) (j jenkinsClientMock) {
 	return
 }
 
-var getBuildMock func(jobŃame string, buildId int64) (build *gojenkins.Build, err error)
-
 func (j jenkinsClientMock) GetBuild(jobName string, buildID int64) (build *gojenkins.Build, err error) {
-	return getBuildMock(jobName, buildID)
+	return &gojenkins.Build{
+		Base: fmt.Sprintf("/job/%v/%v", jobName, buildID),
+		Raw: &gojenkins.BuildResponse{
+			Building: true,
+		},
+	}, nil
 }
 
-var buildJobMock func(jobName string, option ...interface{}) (queueItem int64, err error)
-
 func (j jenkinsClientMock) BuildJob(jobName string, options ...interface{}) (queueItem int64, err error) {
-	return buildJobMock(jobName, options)
+	return j.nextItemID, nil
 }
 
 func (j jenkinsClientMock) GetAllJobs() (jobs []*gojenkins.Job, err error) {
@@ -50,8 +57,8 @@ func (j jenkinsClientMock) GetJob(jobName string, parents ...string) (foundJob *
 	return nil, errors.New("404")
 }
 
-var getQueueItemMock func(int64) (*Task, error)
-
 func (j jenkinsClientMock) GetQueueItem(number int64) (task *Task, err error) {
-	return getQueueItemMock(number)
+	task = &Task{BuildID: j.nextBuildID}
+	j.nextBuildID++
+	return
 }
