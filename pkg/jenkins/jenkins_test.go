@@ -66,19 +66,8 @@ func TestJenkins_List(t *testing.T) {
 		},
 	}
 
-	j := &Jenkins{client: jenkinsClientMock{}}
 	for _, tc := range tcs {
-		getAllJobsMock = func() (jobs []*gojenkins.Job, err error) {
-			for _, jobName := range tc.jobNameList {
-				jobs = append(jobs, &gojenkins.Job{
-					Raw: &gojenkins.JobResponse{
-						Name: jobName,
-					},
-				},
-				)
-			}
-			return jobs, nil
-		}
+		j := &Jenkins{client: newJenkinsClientMock(tc.jobNameList)}
 
 		channel := make(chan Message)
 		defer close(channel)

@@ -2,7 +2,24 @@ package jenkins
 
 import "github.com/bndr/gojenkins"
 
-type jenkinsClientMock struct{}
+type jenkinsClientMock struct {
+	jobs []*gojenkins.Job
+}
+
+func newJenkinsClientMock(jobNames []string) (j jenkinsClientMock) {
+	j = jenkinsClientMock{}
+	for _, name := range jobNames {
+		j.jobs = append(
+			j.jobs,
+			&gojenkins.Job{
+				Raw: &gojenkins.JobResponse{
+					Name: name,
+				},
+			},
+		)
+	}
+	return
+}
 
 var getBuildMock func(jobŃame string, buildId int64) (build *gojenkins.Build, err error)
 
@@ -16,10 +33,8 @@ func (j jenkinsClientMock) BuildJob(jobName string, options ...interface{}) (que
 	return buildJobMock(jobName, options)
 }
 
-var getAllJobsMock func() (jobs []*gojenkins.Job, err error)
-
 func (j jenkinsClientMock) GetAllJobs() (jobs []*gojenkins.Job, err error) {
-	return getAllJobsMock()
+	return j.jobs, nil
 }
 
 var getJobMock func(jobName string, parents ...string) (job *gojenkins.Job, err error)
