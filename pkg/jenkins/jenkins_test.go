@@ -79,11 +79,16 @@ func TestJenkins_List(t *testing.T) {
 
 func TestJenkins_Describe(t *testing.T) {
 	tcs := []struct {
-		jobName  string
-		tmpl     string
-		messages []Message
+		jobNameList []string
+		jobName     string
+		tmpl        string
+		messages    []Message
 	}{
 		{
+			[]string{
+				"job1",
+				"job2",
+			},
 			"job1",
 			"{{ .Raw.Name }}",
 			[]Message{
@@ -96,19 +101,9 @@ func TestJenkins_Describe(t *testing.T) {
 		},
 	}
 
-	j := &Jenkins{client: jenkinsClientMock{}}
 	for _, tc := range tcs {
-		getJobMock = func(jobName string, parents ...string) (job *gojenkins.Job, err error) {
-			return &gojenkins.Job{
-				Raw: &gojenkins.JobResponse{
-					Name: tc.jobName,
-				},
-			}, nil
-		}
-		templ, err := template.New("Job").Parse(tc.tmpl)
-		if err != nil {
-			panic(fmt.Sprintf("Template Creation error %v", err))
-		}
+		templ, _ := template.New("Job").Parse(tc.tmpl)
+		j := &Jenkins{client: newJenkinsClientMock(tc.jobNameList)}
 
 		channel := make(chan Message)
 		defer close(channel)

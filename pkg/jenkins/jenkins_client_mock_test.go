@@ -1,6 +1,10 @@
 package jenkins
 
-import "github.com/bndr/gojenkins"
+import (
+	"errors"
+
+	"github.com/bndr/gojenkins"
+)
 
 type jenkinsClientMock struct {
 	jobs []*gojenkins.Job
@@ -37,10 +41,13 @@ func (j jenkinsClientMock) GetAllJobs() (jobs []*gojenkins.Job, err error) {
 	return j.jobs, nil
 }
 
-var getJobMock func(jobName string, parents ...string) (job *gojenkins.Job, err error)
-
-func (j jenkinsClientMock) GetJob(jobName string, parents ...string) (job *gojenkins.Job, err error) {
-	return getJobMock(jobName, parents...)
+func (j jenkinsClientMock) GetJob(jobName string, parents ...string) (foundJob *gojenkins.Job, err error) {
+	for _, job := range j.jobs {
+		if jobName == job.GetName() {
+			return job, nil
+		}
+	}
+	return nil, errors.New("404")
 }
 
 var getQueueItemMock func(int64) (*Task, error)
