@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"testing"
 	"text/template"
-
-	"github.com/bndr/gojenkins"
 )
 
 func TestJenkins_NewJenkins(t *testing.T) {
@@ -183,10 +181,6 @@ func TestJenkins_Build(t *testing.T) {
 
 	for _, tc := range tcs {
 		j := &Jenkins{client: newJenkinsClientMock(tc.jobNameList, tc.buildID, tc.item)}
-		waitForBuild = func(build *gojenkins.Build) (err error) {
-			build.Raw.Building = false
-			return nil
-		}
 
 		channel := make(chan Message)
 		defer close(channel)

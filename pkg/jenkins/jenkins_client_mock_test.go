@@ -11,12 +11,14 @@ type jenkinsClientMock struct {
 	jobs        []*gojenkins.Job
 	nextBuildID int64
 	nextItemID  int64
+	Version     string
 }
 
 func newJenkinsClientMock(jobNames []string, nextBuildID int64, nextItemID int64) (j jenkinsClientMock) {
 	j = jenkinsClientMock{
 		nextBuildID: nextBuildID,
 		nextItemID:  nextItemID,
+		Version:     "",
 	}
 	for _, name := range jobNames {
 		j.jobs = append(
@@ -31,13 +33,18 @@ func newJenkinsClientMock(jobNames []string, nextBuildID int64, nextItemID int64
 	return
 }
 
-func (j jenkinsClientMock) GetBuild(jobName string, buildID int64) (build *gojenkins.Build, err error) {
-	return &gojenkins.Build{
-		Base: fmt.Sprintf("/job/%v/%v", jobName, buildID),
-		Raw: &gojenkins.BuildResponse{
-			Building: true,
+func (j jenkinsClientMock) GetBuild(jobName string, buildID int64) (build *Build, err error) {
+	return NewBuild(
+		&gojenkins.Build{
+			Base: fmt.Sprintf("/job/%v/%v", jobName, buildID),
+			Jenkins: &gojenkins.Jenkins{
+				Version: j.Version,
+			},
+			Raw: &gojenkins.BuildResponse{
+				Building: true,
+			},
 		},
-	}, nil
+	), nil
 }
 
 func (j jenkinsClientMock) BuildJob(jobName string, options ...interface{}) (queueItem int64, err error) {

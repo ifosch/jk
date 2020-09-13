@@ -132,13 +132,13 @@ func (j *Jenkins) Build(jobName string, params map[string]string, out chan Messa
 			out,
 		)
 	}
-	buildID := task.BuildID
 	reply(
 		fmt.Sprintf("Build queued /job/%v/%v", jobName, buildID),
 		false,
 		false,
 		out,
 	)
+	buildID := task.BuildID
 	for {
 		if buildID != 0 {
 			break
@@ -162,7 +162,7 @@ func (j *Jenkins) Build(jobName string, params map[string]string, out chan Messa
 		false,
 		out,
 	)
-	err = waitForBuild(build)
+	err = build.Wait()
 	if err != nil {
 		reply(
 			fmt.Sprintf("Error polling build %v", err),

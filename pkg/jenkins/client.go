@@ -42,3 +42,13 @@ func (c *Client) GetQueueItem(number int64) (task *Task, err error) {
 		BuildID:     jenkinsTask.Raw.Executable.Number,
 	}, nil
 }
+
+// GetBuild ...
+func (c *Client) GetBuild(jobName string, buildID int64) (build *Build, err error) {
+	jenkinsBuild, err := c.Jenkins.GetBuild(jobName, buildID)
+	if err != nil {
+		return
+	}
+	build = NewBuild(jenkinsBuild)
+	return
+}
