@@ -131,17 +131,17 @@ func TestJenkins_Build(t *testing.T) {
 			100,
 			[]Message{
 				{
-					Message: "Build queued /job/job1/100",
+					Message: "Build queued for job job1",
 					Error:   false,
 					Done:    false,
 				},
 				{
-					Message: "Build started /job/job1/100",
+					Message: "Build started http://mockedjenkins/job/job1/100",
 					Error:   false,
 					Done:    false,
 				},
 				{
-					Message: "Build finished /job/job1/100",
+					Message: "Build finished http://mockedjenkins/job/job1/100",
 					Error:   false,
 					Done:    true,
 				},
@@ -161,17 +161,17 @@ func TestJenkins_Build(t *testing.T) {
 			200,
 			[]Message{
 				{
-					Message: "Build queued /job/job_with_params/200",
+					Message: "Build queued for job job_with_params",
 					Error:   false,
 					Done:    false,
 				},
 				{
-					Message: "Build started /job/job_with_params/200",
+					Message: "Build started http://mockedjenkins/job/job_with_params/200",
 					Error:   false,
 					Done:    false,
 				},
 				{
-					Message: "Build finished /job/job_with_params/200",
+					Message: "Build finished http://mockedjenkins/job/job_with_params/200",
 					Error:   false,
 					Done:    true,
 				},

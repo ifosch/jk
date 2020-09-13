@@ -1,6 +1,7 @@
 package jenkins
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/bndr/gojenkins"
@@ -25,6 +26,14 @@ func (b *Build) Poll() (int, error) {
 	}
 	b.Raw.Building = false
 	return 200, nil
+}
+
+// GetURL ...
+func (b *Build) GetURL() string {
+	if b.Build.Jenkins.Version != "" {
+		return b.Build.GetUrl()
+	}
+	return fmt.Sprintf("%s/job/%v/%v", b.Jenkins.Server, b.Job.GetName(), b.Raw.ID)
 }
 
 // Wait ...

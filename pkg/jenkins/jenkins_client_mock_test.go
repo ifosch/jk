@@ -11,6 +11,7 @@ type jenkinsClientMock struct {
 	jobs        []*gojenkins.Job
 	nextBuildID int64
 	nextItemID  int64
+	Server      string
 	Version     string
 }
 
@@ -18,6 +19,7 @@ func newJenkinsClientMock(jobNames []string, nextBuildID int64, nextItemID int64
 	j = jenkinsClientMock{
 		nextBuildID: nextBuildID,
 		nextItemID:  nextItemID,
+		Server:      "http://mockedjenkins",
 		Version:     "",
 	}
 	for _, name := range jobNames {
@@ -38,10 +40,17 @@ func (j jenkinsClientMock) GetBuild(jobName string, buildID int64) (build *Build
 		&gojenkins.Build{
 			Base: fmt.Sprintf("/job/%v/%v", jobName, buildID),
 			Jenkins: &gojenkins.Jenkins{
+				Server:  j.Server,
 				Version: j.Version,
+			},
+			Job: &gojenkins.Job{
+				Raw: &gojenkins.JobResponse{
+					Name: jobName,
+				},
 			},
 			Raw: &gojenkins.BuildResponse{
 				Building: true,
+				ID:       fmt.Sprintf("%v", buildID),
 			},
 		},
 	), nil

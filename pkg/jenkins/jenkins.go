@@ -133,7 +133,7 @@ func (j *Jenkins) Build(jobName string, params map[string]string, out chan Messa
 		)
 	}
 	reply(
-		fmt.Sprintf("Build queued /job/%v/%v", jobName, buildID),
+		fmt.Sprintf("Build queued for job %v", jobName),
 		false,
 		false,
 		out,
@@ -157,7 +157,7 @@ func (j *Jenkins) Build(jobName string, params map[string]string, out chan Messa
 		)
 	}
 	reply(
-		fmt.Sprintf("Build started %v", build.Base),
+		fmt.Sprintf("Build started %v", build.GetURL()),
 		false,
 		false,
 		out,
@@ -172,7 +172,7 @@ func (j *Jenkins) Build(jobName string, params map[string]string, out chan Messa
 		)
 	}
 	reply(
-		fmt.Sprintf("Build finished %v", build.Base),
+		fmt.Sprintf("Build finished %v", build.GetURL()),
 		false,
 		true,
 		out,
