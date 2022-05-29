@@ -35,7 +35,7 @@ func Describe() (t *template.Template, err error) {
 		"trim": trim,
 	}).Parse(tmpl)
 	if err != nil {
-		return nil, fmt.Errorf("Template Creation error %v", err)
+		return nil, fmt.Errorf("template Creation error %v", err)
 	}
 	return t, nil
 }

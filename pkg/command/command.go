@@ -23,7 +23,8 @@ func (c *Command) Run() {
 	c.Execute(c, c.flags.Args())
 }
 
-func (c *Command) usageAndExit(msg string) {
+// UsageAndExit prints the msg before exiting with error
+func (c *Command) UsageAndExit(msg string) {
 	if msg != "" {
 		fmt.Fprint(os.Stderr, msg)
 		fmt.Fprintf(os.Stderr, "\n")

@@ -55,7 +55,7 @@ func (j *Jenkins) List(out chan Message) {
 	}
 	for _, job := range jobs {
 		reply(
-			fmt.Sprintf(job.GetName()),
+			job.GetName(),
 			false,
 			false,
 			out,
@@ -113,7 +113,7 @@ func (j *Jenkins) Describe(jobName string, t *template.Template, out chan Messag
 
 // Results returns results for a specific job's build.
 func (j *Jenkins) Results(jobName string, buildID int64) (r []*Case, err error) {
-	b := &Build{}
+	var b *Build
 	if buildID > 0 {
 		b, err = j.client.GetBuild(jobName, buildID)
 	} else {
@@ -129,14 +129,14 @@ func (j *Jenkins) Results(jobName string, buildID int64) (r []*Case, err error) 
 	}
 
 	if len(results.Suites) == 0 {
-		return nil, fmt.Errorf("Last build (%v) for job %v not completed", b.GetBuildNumber(), jobName)
+		return nil, fmt.Errorf("last build (%v) for job %v not completed", b.GetBuildNumber(), jobName)
 	}
 
 	r = []*Case{}
 	for _, suite := range results.Suites {
 		for _, testCase := range suite.Cases {
 			r = append(r, &Case{
-				Name: testCase.Name,
+				Name:   testCase.Name,
 				Status: testCase.Status,
 			})
 		}

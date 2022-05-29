@@ -19,16 +19,6 @@ Commands:
   results  Gets the results of a job's build
 `
 
-func usageAndExit(msg string) {
-	if msg != "" {
-		fmt.Fprint(os.Stderr, msg)
-		fmt.Fprintf(os.Stderr, "\n")
-	}
-
-	flag.Usage()
-	os.Exit(1)
-}
-
 func main() {
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, usage)
@@ -37,7 +27,7 @@ func main() {
 	var cmd *command.Command
 
 	if len(os.Args) == 1 {
-		usageAndExit("jk: You need to provide a command.\n")
+		cmd.UsageAndExit("jk: You need to provide a command.\n")
 	}
 
 	switch os.Args[1] {
@@ -50,7 +40,7 @@ func main() {
 	case "results":
 		cmd = command.NewResultsCommand()
 	default:
-		usageAndExit(fmt.Sprintf("jk: '%s' is not a jk comand.\n", os.Args[1]))
+		cmd.UsageAndExit(fmt.Sprintf("jk: '%s' is not a jk comand.\n", os.Args[1]))
 	}
 
 	cmd.Init(os.Args[2:])

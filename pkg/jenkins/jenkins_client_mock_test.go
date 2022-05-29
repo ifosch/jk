@@ -15,8 +15,8 @@ type jenkinsClientMock struct {
 	Version     string
 }
 
-func newJenkinsClientMock(jobNames []string, nextBuildID int64, nextItemID int64) (j jenkinsClientMock) {
-	j = jenkinsClientMock{
+func newJenkinsClientMock(jobNames []string, nextBuildID int64, nextItemID int64) (j *jenkinsClientMock) {
+	j = &jenkinsClientMock{
 		nextBuildID: nextBuildID,
 		nextItemID:  nextItemID,
 		Server:      "http://mockedjenkins",
@@ -73,7 +73,7 @@ func (j jenkinsClientMock) GetJob(jobName string, parents ...string) (foundJob *
 	return nil, errors.New("404")
 }
 
-func (j jenkinsClientMock) GetQueueItem(number int64) (task *Task, err error) {
+func (j *jenkinsClientMock) GetQueueItem(number int64) (task *Task, err error) {
 	task = &Task{BuildID: j.nextBuildID}
 	j.nextBuildID++
 	return

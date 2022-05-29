@@ -3,7 +3,7 @@
 package jenkins
 
 // Case ...
-type Case struct{
-	Name string
+type Case struct {
+	Name   string
 	Status string
 }
