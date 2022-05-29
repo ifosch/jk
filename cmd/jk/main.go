@@ -13,6 +13,7 @@ var usage = `Usage: jk command [options]
 A jk CLI focused in job management tasks.
 
 Commands:
+  build    Builds a job
   list     Lists all jobs available
 `
 
@@ -38,6 +39,8 @@ func main() {
 	}
 
 	switch os.Args[1] {
+	case "build":
+		cmd = command.NewBuildCommand()
 	case "list":
 		cmd = command.NewListCommand()
 	default:
