@@ -52,3 +52,18 @@ func (c *Client) GetBuild(jobName string, buildID int64) (build *Build, err erro
 	build = NewBuild(jenkinsBuild)
 	return
 }
+
+// GetLastBuild ...
+func (c *Client) GetLastBuild(jobName string) (*Build, error) {
+	job, err := c.Jenkins.GetJob(jobName)
+	if err != nil {
+		return nil, err
+	}
+
+	buildIDs, err := job.GetAllBuildIds()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.GetBuild(jobName, buildIDs[0].Number)
+}

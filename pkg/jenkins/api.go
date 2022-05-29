@@ -9,4 +9,5 @@ type API interface {
 	GetAllJobs() ([]*gojenkins.Job, error)
 	GetJob(string, ...string) (*gojenkins.Job, error)
 	GetQueueItem(int64) (*Task, error)
+	GetLastBuild(string) (*Build, error)
 }

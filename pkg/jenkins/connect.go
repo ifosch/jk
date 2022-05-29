@@ -20,7 +20,7 @@ func Connect() (j *Jenkins, err error) {
 	}
 	j, err = NewJenkins(url, user, password, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Error connecting to Jenkins at %v as %v:\n%v", url, user, err)
+		return nil, fmt.Errorf("error connecting to Jenkins at %v as %v:\n%v", url, user, err)
 	}
 	return j, nil
 }
