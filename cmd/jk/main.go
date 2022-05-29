@@ -16,6 +16,7 @@ Commands:
   build    Builds a job
   describe Describes a job
   list     Lists all jobs available
+  results  Gets the results of a job's build
 `
 
 func usageAndExit(msg string) {
@@ -46,6 +47,8 @@ func main() {
 		cmd = command.NewDescribeCommand()
 	case "list":
 		cmd = command.NewListCommand()
+	case "results":
+		cmd = command.NewResultsCommand()
 	default:
 		usageAndExit(fmt.Sprintf("jk: '%s' is not a jk comand.\n", os.Args[1]))
 	}
