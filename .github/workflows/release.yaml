@@ -1,0 +1,42 @@
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  GO_VERSION: '^1.17'
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        destination_os: [linux, windows, darwin]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      -
+        name: Tidy dependencies to local
+        run : |
+          go mod tidy
+      -
+        name: Build
+        run: |
+          scripts/build.sh ${{ matrix.destination_os }} amd64
+      -
+        name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+      -
+        name: Release built binaries
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token 
+          gh release upload ${{ steps.get_version.outputs.VERSION }} build/*
