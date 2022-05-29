@@ -78,3 +78,7 @@ func (j jenkinsClientMock) GetQueueItem(number int64) (task *Task, err error) {
 	j.nextBuildID++
 	return
 }
+
+func (j jenkinsClientMock) GetLastBuild(string) (*Build, error) {
+	return nil, nil
+}

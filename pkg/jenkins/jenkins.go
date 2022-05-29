@@ -111,6 +111,39 @@ func (j *Jenkins) Describe(jobName string, t *template.Template, out chan Messag
 	)
 }
 
+// Results returns results for a specific job's build.
+func (j *Jenkins) Results(jobName string, buildID int64) (r []*Case, err error) {
+	b := &Build{}
+	if buildID > 0 {
+		b, err = j.client.GetBuild(jobName, buildID)
+	} else {
+		b, err = j.client.GetLastBuild(jobName)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	results, err := b.GetResults()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(results.Suites) == 0 {
+		return nil, fmt.Errorf("Last build (%v) for job %v not completed", b.GetBuildNumber(), jobName)
+	}
+
+	r = []*Case{}
+	for _, suite := range results.Suites {
+		for _, testCase := range suite.Cases {
+			r = append(r, &Case{
+				Name: testCase.Name,
+				Status: testCase.Status,
+			})
+		}
+	}
+	return
+}
+
 // Build executes jobName with params parameters. It will use the
 // channel to reply with updates on the progress of the build.
 func (j *Jenkins) Build(jobName string, params map[string]string, out chan Message) {

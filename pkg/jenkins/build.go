@@ -50,3 +50,8 @@ func (b *Build) Wait() (err error) {
 	}
 	return
 }
+
+// GetResults ...
+func (b *Build) GetResults() (results *gojenkins.TestResult, err error) {
+	return b.Build.GetResultSet()
+}
