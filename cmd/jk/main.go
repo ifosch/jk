@@ -14,6 +14,7 @@ A jk CLI focused in job management tasks.
 
 Commands:
   build    Builds a job
+  describe Describes a job
   list     Lists all jobs available
 `
 
@@ -41,6 +42,8 @@ func main() {
 	switch os.Args[1] {
 	case "build":
 		cmd = command.NewBuildCommand()
+	case "describe":
+		cmd = command.NewDescribeCommand()
 	case "list":
 		cmd = command.NewListCommand()
 	default:
