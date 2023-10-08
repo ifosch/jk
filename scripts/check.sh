@@ -2,10 +2,15 @@
 
 set -eu
 
+mecha_tests_check() {
+    echo "*** Run unit tests"
+    go test -v ./... -race -covermode=atomic
+}
+
 mecha_complexity_check() {
     echo "*** Complexity check"
     go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
-    gocyclo -avg -total -over 15 .
+    gocyclo -avg -top 5 -over 15 .
 }
 
 mecha_format_check() {
