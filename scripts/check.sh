@@ -2,56 +2,56 @@
 
 set -eu
 
-mecha_tests_check() {
+tests_check() {
     echo "*** Run unit tests"
     go test -v ./... -race -covermode=atomic
 }
 
-mecha_complexity_check() {
+complexity_check() {
     echo "*** Complexity check"
     go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
     gocyclo -avg -top 5 -over 15 .
 }
 
-mecha_format_check() {
+format_check() {
     echo "*** Format check"
     gofmt -s -e -d -l . | tee /tmp/gofmt.output && [ $(cat /tmp/gofmt.output | wc -l) -eq 0 ]
 }
 
-mecha_inefficiencies_check() {
+inefficiencies_check() {
     echo "*** Inefficiencies check"
     go install github.com/gordonklaus/ineffassign@latest
     go mod tidy
     ineffassign ./...
 }
 
-mecha_smells_check() {
+smells_check() {
     echo "*** Smells check"
     go mod tidy
     go vet ./...
 }
 
-mecha_spelling_check() {
+spelling_check() {
     echo "*** Spelling check"
     go install github.com/client9/misspell/cmd/misspell@latest
     misspell -error .
 }
 
-mecha_static_check() {
+static_check() {
     echo "*** Static check"
     go install honnef.co/go/tools/cmd/staticcheck@latest
     go mod download
     staticcheck ./...
 }
 
-mecha_style_check() {
+style_check() {
     echo "*** Style check"
     go install golang.org/x/lint/golint@latest
     golint ./...
 }
 
 check_functions() {
-    declare -F | awk '{print $3}' | grep -E "^mecha_" | grep -E "_check$" | sed -e 's/_check$//'
+    declare -F | awk '{print $3}' | grep -E "_check$" | sed -e 's/_check$//'
 }
 
 try() {
